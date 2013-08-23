@@ -13,25 +13,25 @@ class Pronamic_Google_Maps_Mashup {
 		Pronamic_Google_Maps_Site::requireSiteScript();
 
 		$defaults = array(
-			'width'                  => Pronamic_Google_Maps_Maps::$defaultWidth ,
-			'height'                 => Pronamic_Google_Maps_Maps::$defaultHeight , 
-			'latitude'               => 0 , 
-			'longitude'              => 0 , 
-			'zoom'                   => Pronamic_Google_Maps_Maps::MAP_ZOOM_DEFAULT , 
-			'map_type_id'            => Pronamic_Google_Maps_Maps::MAP_TYPE_DEFAULT , 
-			'hide_list'              => true , 
-			'fit_bounds'             => true , 
-			'center_client_location' => false , 
+			'width'                  => Pronamic_Google_Maps_Maps::$defaultWidth,
+			'height'                 => Pronamic_Google_Maps_Maps::$defaultHeight,
+			'latitude'               => 0,
+			'longitude'              => 0,
+			'zoom'                   => Pronamic_Google_Maps_Maps::MAP_ZOOM_DEFAULT,
+			'map_type_id'            => Pronamic_Google_Maps_Maps::MAP_TYPE_DEFAULT,
+			'hide_list'              => true,
+			'fit_bounds'             => true,
+			'center_client_location' => false,
 			'marker_options'         => array(
 
-			) , 
+			),
 			'map_options'            => array(
 
-			) ,
+			),
 			'marker_cluster_options' => array(
 				
-			) , 
-			'echo'                   => true 
+			),
+			'echo'                   => true
 		);
 
 		$arguments = wp_parse_args( $arguments, $defaults );
@@ -55,7 +55,7 @@ class Pronamic_Google_Maps_Mashup {
 		$options->center->latitude = $arguments['latitude'];
 		$options->center->longitude = $arguments['longitude'];
 		$options->hideList = $arguments['hide_list'];
-		$options->fitBounds = $arguments['fit_bounds'];
+		$options->fitBounds = filter_var( $arguments['fit_bounds'], FILTER_VALIDATE_BOOLEAN );
 		$options->centerClientLocation = $arguments['center_client_location'];
 			
 		// Map options
@@ -100,10 +100,10 @@ class Pronamic_Google_Maps_Mashup {
 				$description = apply_filters( Pronamic_Google_Maps_Filters::FILTER_MASHUP_ITEM, $description );
 
 				$info = new Pronamic_Google_Maps_Info();
-				$info->title = $pgm->title;
-				$info->description = $pgm->description;
-				$info->latitude = $pgm->latitude;
-				$info->longitude = $pgm->longitude;
+				$info->title         = $pgm->title;
+				$info->description   = $pgm->description;
+				$info->latitude      = $pgm->latitude;
+				$info->longitude     = $pgm->longitude;
 				$info->markerOptions = new stdClass();
 
 				// Marker options
@@ -117,12 +117,13 @@ class Pronamic_Google_Maps_Mashup {
 				}
 
 				$marker = new stdClass();
-				$marker->options = $info->markerOptions;
-				$marker->lat = $pgm->latitude;
-				$marker->lng = $pgm->longitude;
-				$marker->title = $pgm->title;
+				$marker->options     = $info->markerOptions;
+				$marker->lat         = $pgm->latitude;
+				$marker->lng         = $pgm->longitude;
+				$marker->title       = $pgm->title;
 				$marker->description = $description;
-				
+				$marker->post_id     = get_the_ID();
+
 				$options->markers[] = $marker;
 
 				$items .= '<li>';
@@ -145,7 +146,7 @@ class Pronamic_Google_Maps_Mashup {
 		$content = '<div class="pgmm">';
 		$content .= sprintf( '<input type="hidden" name="pgmm-info" value="%s" />', esc_attr( json_encode( $options ) ) );
 
-		$content .= sprintf( '<div class="canvas" style="width: %dpx; height: %dpx;">', $options->width, $options->height );
+		$content .= sprintf( '<div class="canvas" style="width: %s; height: %s;">', $options->width, $options->height );
 		$content .= sprintf( '</div>' );
 
 		if ( ! empty( $items ) ) {
